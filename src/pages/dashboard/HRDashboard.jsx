@@ -1,13 +1,24 @@
 import { useDataStore } from '@/store/dataStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/store/authStore';
 import { Briefcase, UserPlus, Calendar, PlusCircle, ArrowRight, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/modal';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function HRDashboard() {
   const { user } = useAuthStore();
-  const { jobs, candidates, vendors } = useDataStore();
+  const { jobs, candidates, vendors, addJob, showToast } = useDataStore();
+  const navigate = useNavigate();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newJob, setNewJob] = useState({
+    title: '', department: '', location: '', type: 'Full-time',
+    status: 'Open', openings: 1, salary: '', description: '', assignedVendors: [],
+  });
 
   const activeJobs = jobs.filter(j => j.status === 'Open');
   const inPipeline = candidates.filter(c => c.stage !== 'Hired' && c.stage !== 'Rejected');
@@ -19,6 +30,18 @@ export function HRDashboard() {
     { label: 'Interviews Scheduled', value: interviewCandidates.length, icon: Calendar, color: 'from-amber-500 to-amber-600', desc: 'This week' },
   ];
 
+  const handleCreateJob = (e) => {
+    e.preventDefault();
+    if (!newJob.title.trim() || !newJob.department.trim() || !newJob.location.trim()) {
+      showToast('Please fill in all required fields', 'error');
+      return;
+    }
+    addJob(newJob);
+    setNewJob({ title: '', department: '', location: '', type: 'Full-time', status: 'Open', openings: 1, salary: '', description: '', assignedVendors: [] });
+    setShowCreateModal(false);
+    showToast('Job requisition created successfully!', 'success');
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -26,14 +49,17 @@ export function HRDashboard() {
           <h2 className="text-3xl font-extrabold tracking-tight text-[#0F172A]">HR Dashboard</h2>
           <p className="text-[#64748B] mt-1 text-base">Welcome back, {user?.name}. Here's your recruitment overview.</p>
         </div>
-        <Button className="h-11 px-6 rounded-xl shadow-md shadow-primary/20 bg-[#2563EB] hover:bg-[#1D4ED8]">
+        <Button 
+          onClick={() => setShowCreateModal(true)}
+          className="h-11 px-6 rounded-xl shadow-md shadow-blue-200/50 bg-[#2563EB] hover:bg-[#1D4ED8] transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
+        >
           <PlusCircle className="mr-2 h-5 w-5" /> Create Job
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat, i) => (
-          <Card key={i} className="border-none shadow-[0_2px_12px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300 overflow-hidden">
+          <Card key={i} className="stagger-item border-none shadow-[0_2px_12px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300 overflow-hidden card-hover">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -93,14 +119,21 @@ export function HRDashboard() {
               <h3 className="text-lg font-bold text-[#0F172A]">Active Requisitions</h3>
               <p className="text-sm text-[#64748B]">Open positions requiring attention</p>
             </div>
-            <button className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1">
+            <button 
+              onClick={() => navigate('/jobs')}
+              className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 transition-colors"
+            >
               View all <ArrowRight className="w-4 h-4" />
             </button>
           </div>
           <CardContent className="p-0">
             <div className="divide-y divide-[#E2E8F0]">
               {activeJobs.slice(0, 4).map(job => (
-                <div key={job.id} className="flex items-center p-5 hover:bg-gray-50 transition-colors cursor-pointer group">
+                <div 
+                  key={job.id} 
+                  className="flex items-center p-5 hover:bg-gray-50 transition-colors cursor-pointer group"
+                  onClick={() => navigate('/jobs')}
+                >
                   <div className="flex-1">
                     <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">{job.title}</p>
                     <p className="text-xs text-[#64748B] mt-1 flex items-center gap-2">
@@ -118,10 +151,86 @@ export function HRDashboard() {
                   </div>
                 </div>
               ))}
+              {activeJobs.length === 0 && (
+                <div className="p-8 text-center text-[#64748B]">No active requisitions.</div>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Create Job Modal */}
+      <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)} size="md">
+        <ModalHeader onClose={() => setShowCreateModal(false)}>
+          <h3 className="text-xl font-bold text-[#0F172A]">Quick Create Job</h3>
+          <p className="text-sm text-[#64748B] mt-1">Add a new job requisition.</p>
+        </ModalHeader>
+        <form onSubmit={handleCreateJob}>
+          <ModalBody>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="md:col-span-2 space-y-2">
+                <Label className="text-sm font-semibold text-[#0F172A]">Job Title *</Label>
+                <Input
+                  placeholder="e.g. Senior Frontend Engineer"
+                  value={newJob.title}
+                  onChange={(e) => setNewJob(prev => ({ ...prev, title: e.target.value }))}
+                  className="h-11 bg-[#F8FAFC] border-[#E2E8F0]"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-[#0F172A]">Department *</Label>
+                <Input
+                  placeholder="e.g. Engineering"
+                  value={newJob.department}
+                  onChange={(e) => setNewJob(prev => ({ ...prev, department: e.target.value }))}
+                  className="h-11 bg-[#F8FAFC] border-[#E2E8F0]"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-[#0F172A]">Location *</Label>
+                <Input
+                  placeholder="e.g. Remote"
+                  value={newJob.location}
+                  onChange={(e) => setNewJob(prev => ({ ...prev, location: e.target.value }))}
+                  className="h-11 bg-[#F8FAFC] border-[#E2E8F0]"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-[#0F172A]">Type</Label>
+                <select
+                  className="flex h-11 w-full appearance-none rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2 text-sm text-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]/20 focus-visible:border-[#2563EB] shadow-sm transition-colors"
+                  value={newJob.type}
+                  onChange={(e) => setNewJob(prev => ({ ...prev, type: e.target.value }))}
+                >
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Internship">Internship</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-[#0F172A]">Openings</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={newJob.openings}
+                  onChange={(e) => setNewJob(prev => ({ ...prev, openings: parseInt(e.target.value) || 1 }))}
+                  className="h-11 bg-[#F8FAFC] border-[#E2E8F0]"
+                />
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)} className="rounded-xl px-5">Cancel</Button>
+            <Button type="submit" className="rounded-xl px-6 bg-[#2563EB] hover:bg-[#1D4ED8] shadow-md shadow-blue-200/50">
+              <PlusCircle className="mr-2 h-4 w-4" /> Create Job
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
     </div>
   );
 }

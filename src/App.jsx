@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { ToastNotification } from '@/components/ui/toast-notification';
 
 import { Login } from '@/pages/Login';
 import { AdminDashboard } from '@/pages/dashboard/AdminDashboard';
@@ -12,6 +13,8 @@ import { VendorList } from '@/pages/vendors/VendorList';
 import { JobList } from '@/pages/jobs/JobList';
 import { CandidateList } from '@/pages/candidates/CandidateList';
 import { Pipeline } from '@/pages/candidates/Pipeline';
+import { Interviews } from '@/pages/interviews/Interviews';
+import { Reports } from '@/pages/reports/Reports';
 
 function App() {
   const { isAuthenticated, user } = useAuthStore();
@@ -35,10 +38,13 @@ function App() {
           <Route path="/jobs" element={<JobList />} />
           <Route path="/candidates" element={<CandidateList />} />
           <Route path="/pipeline" element={<Pipeline />} />
+          <Route path="/interviews" element={<Interviews />} />
+          <Route path="/reports" element={<Reports />} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppLayout>
+      <ToastNotification />
     </Router>
   );
 }

@@ -3,10 +3,12 @@ import { useDataStore } from '@/store/dataStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, UserPlus, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function VendorDashboard() {
   const { user } = useAuthStore();
   const { jobs, candidates } = useDataStore();
+  const navigate = useNavigate();
 
   // Simulate vendor-specific data (vendor v1 as demo)
   const myJobs = jobs.filter(j => j.assignedVendors.includes('v1'));
@@ -29,7 +31,7 @@ export function VendorDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
-          <Card key={i} className="border-none shadow-[0_2px_12px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300">
+          <Card key={i} className="stagger-item border-none shadow-[0_2px_12px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300 card-hover">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -52,14 +54,17 @@ export function VendorDashboard() {
               <h3 className="text-lg font-bold text-[#0F172A]">Assigned Jobs</h3>
               <p className="text-sm text-[#64748B]">Open positions you're sourcing for</p>
             </div>
-            <button className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1">
+            <button 
+              onClick={() => navigate('/jobs')}
+              className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 transition-colors"
+            >
               View all <ArrowRight className="w-4 h-4" />
             </button>
           </div>
           <CardContent className="p-0">
             <div className="divide-y divide-[#E2E8F0]">
               {myJobs.map(job => (
-                <div key={job.id} className="flex items-center p-5 hover:bg-gray-50 transition-colors cursor-pointer group">
+                <div key={job.id} className="flex items-center p-5 hover:bg-gray-50 transition-colors cursor-pointer group" onClick={() => navigate('/jobs')}>
                   <div className="flex-1">
                     <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">{job.title}</p>
                     <p className="text-xs text-[#64748B] mt-1">{job.department} • {job.location}</p>
@@ -80,6 +85,12 @@ export function VendorDashboard() {
               <h3 className="text-lg font-bold text-[#0F172A]">My Submissions</h3>
               <p className="text-sm text-[#64748B]">Candidates you've submitted</p>
             </div>
+            <button 
+              onClick={() => navigate('/candidates')}
+              className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 transition-colors"
+            >
+              View all <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
           <CardContent className="p-0">
             <div className="divide-y divide-[#E2E8F0]">
@@ -89,7 +100,7 @@ export function VendorDashboard() {
                   Submitted: 'default', Screened: 'secondary', Interview: 'warning', Hired: 'success', Rejected: 'destructive'
                 };
                 return (
-                  <div key={candidate.id} className="flex items-center p-5 hover:bg-gray-50 transition-colors">
+                  <div key={candidate.id} className="flex items-center p-5 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate('/candidates')}>
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200 text-xs">
                       {candidate.name.split(' ').map(n => n[0]).join('')}
                     </div>

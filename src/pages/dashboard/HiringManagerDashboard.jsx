@@ -4,10 +4,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UserPlus, MessageSquare, CheckCircle, XCircle, Star, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export function HiringManagerDashboard() {
   const { user } = useAuthStore();
-  const { candidates, jobs } = useDataStore();
+  const { candidates, jobs, updateCandidateStage, showToast } = useDataStore();
+  const navigate = useNavigate();
 
   const toReview = candidates.filter(c => c.stage === 'Screened' || c.stage === 'Interview');
   const interviewCandidates = candidates.filter(c => c.stage === 'Interview');
@@ -19,6 +21,18 @@ export function HiringManagerDashboard() {
     { label: 'Hired', value: hired.length, icon: CheckCircle, color: 'from-emerald-500 to-emerald-600' },
   ];
 
+  const handleHire = (candidateId, candidateName, e) => {
+    e.stopPropagation();
+    updateCandidateStage(candidateId, 'Hired');
+    showToast(`${candidateName} has been hired! 🎉`, 'success');
+  };
+
+  const handleReject = (candidateId, candidateName, e) => {
+    e.stopPropagation();
+    updateCandidateStage(candidateId, 'Rejected');
+    showToast(`${candidateName} has been rejected`, 'info');
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -28,7 +42,7 @@ export function HiringManagerDashboard() {
 
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat, i) => (
-          <Card key={i} className="border-none shadow-[0_2px_12px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300">
+          <Card key={i} className="stagger-item border-none shadow-[0_2px_12px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300 card-hover">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -51,7 +65,10 @@ export function HiringManagerDashboard() {
             <h3 className="text-lg font-bold text-[#0F172A]">Candidates Awaiting Review</h3>
             <p className="text-sm text-[#64748B]">Screened and interview candidates need your feedback</p>
           </div>
-          <button className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1">
+          <button 
+            onClick={() => navigate('/pipeline')}
+            className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 transition-colors"
+          >
             View pipeline <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -80,10 +97,22 @@ export function HiringManagerDashboard() {
                     )}
                     <Badge variant={stageBadge[candidate.stage]} className="px-3 py-1 text-xs">{candidate.stage}</Badge>
                     <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-50 hover:text-emerald-600">
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-50 hover:text-emerald-600"
+                        onClick={(e) => handleHire(candidate.id, candidate.name, e)}
+                        title="Hire candidate"
+                      >
                         <CheckCircle className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-lg hover:bg-red-50 hover:text-red-600">
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-8 w-8 p-0 rounded-lg hover:bg-red-50 hover:text-red-600"
+                        onClick={(e) => handleReject(candidate.id, candidate.name, e)}
+                        title="Reject candidate"
+                      >
                         <XCircle className="w-4 h-4" />
                       </Button>
                     </div>
@@ -93,7 +122,7 @@ export function HiringManagerDashboard() {
             })}
             {toReview.length === 0 && (
               <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-7 h-7 text-emerald-500" />
                 </div>
                 <p className="font-semibold text-[#0F172A]">All caught up!</p>

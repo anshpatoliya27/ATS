@@ -4,83 +4,130 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Briefcase, Shield, Users, BarChart3 } from 'lucide-react';
+
+const roles = [
+  { value: 'Admin', label: 'Admin', icon: Shield, desc: 'Full system access', color: 'from-violet-500 to-purple-600' },
+  { value: 'HR', label: 'HR', icon: Users, desc: 'Manage jobs & candidates', color: 'from-blue-500 to-blue-600' },
+  { value: 'Vendor', label: 'Vendor', icon: Briefcase, desc: 'Submit candidates', color: 'from-amber-500 to-orange-600' },
+  { value: 'Hiring Manager', label: 'Hiring Manager', icon: BarChart3, desc: 'Review & approve', color: 'from-emerald-500 to-teal-600' },
+];
 
 export function Login() {
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('HR');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (email) {
-      login(email, role);
+      setIsLoading(true);
+      // Simulate a brief loading state
+      setTimeout(() => {
+        login(email, role);
+      }, 400);
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4 font-sans selection:bg-[#2563EB] selection:text-white relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#2563EB]/5 blur-[100px] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#2563EB]/5 blur-[100px] pointer-events-none"></div>
+      {/* Animated background gradient orbs */}
+      <div className="absolute top-[-20%] left-[-15%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-[#2563EB]/8 to-[#7C3AED]/5 blur-[120px] pointer-events-none animate-pulse-soft"></div>
+      <div className="absolute bottom-[-20%] right-[-15%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-[#2563EB]/6 to-[#06B6D4]/4 blur-[120px] pointer-events-none animate-pulse-soft" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-[30%] right-[20%] w-[25%] h-[25%] rounded-full bg-[#F59E0B]/4 blur-[80px] pointer-events-none"></div>
 
-      <Card className="w-full max-w-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-[#E2E8F0] bg-white/95 backdrop-blur-xl relative z-10 p-2">
-        <CardHeader className="space-y-2 text-center pb-8 pt-6">
-          <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 bg-[#2563EB] rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/30">
-              H
-            </div>
-          </div>
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-[#0F172A]">Welcome to HireFlow</CardTitle>
-          <CardDescription className="text-base text-[#64748B]">
-            Sign in to manage your recruitment pipeline
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-2.5">
-              <Label htmlFor="email" className="text-[#0F172A] font-semibold text-sm">Email Address</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="you@company.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required 
-                className="h-12 bg-[#F8FAFC] border-[#E2E8F0] focus-visible:ring-[#2563EB]/20 focus-visible:border-[#2563EB]"
-              />
-            </div>
-            <div className="space-y-2.5">
-              <Label htmlFor="role" className="text-[#0F172A] font-semibold text-sm">Select Role</Label>
-              <div className="relative">
-                <select 
-                  id="role"
-                  className="flex h-12 w-full appearance-none rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2 text-sm text-[#0F172A] ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]/20 focus-visible:border-[#2563EB] shadow-sm transition-colors"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="HR">HR</option>
-                  <option value="Vendor">Vendor</option>
-                  <option value="Hiring Manager">Hiring Manager</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#64748B]">
-                  <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                  </svg>
-                </div>
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
+        <Card className="shadow-[0_8px_40px_rgb(0,0,0,0.06)] border-[#E2E8F0] bg-white/95 backdrop-blur-xl p-2 rounded-2xl">
+          <CardHeader className="space-y-2 text-center pb-6 pt-6">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-blue-500/30 transition-transform hover:scale-105 hover:rotate-3">
+                H
               </div>
             </div>
-            <Button type="submit" className="w-full h-12 text-base font-bold bg-[#2563EB] hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/20 mt-4 rounded-xl">
-              Continue to Dashboard
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-2 pt-4 pb-6">
-          <div className="text-sm text-center text-[#64748B] w-full">
-            By signing in, you agree to our <a href="#" className="text-[#2563EB] hover:underline font-medium">Terms of Service</a>
-          </div>
-        </CardFooter>
-      </Card>
+            <CardTitle className="text-3xl font-extrabold tracking-tight text-[#0F172A]">Welcome to HireFlow</CardTitle>
+            <CardDescription className="text-base text-[#64748B]">
+              Sign in to manage your recruitment pipeline
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2.5">
+                <Label htmlFor="email" className="text-[#0F172A] font-semibold text-sm">Email Address</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="you@company.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                  className="h-12 bg-[#F8FAFC] border-[#E2E8F0] focus-visible:ring-[#2563EB]/20 focus-visible:border-[#2563EB] rounded-xl text-base"
+                />
+              </div>
+
+              {/* Role selector cards */}
+              <div className="space-y-2.5">
+                <Label className="text-[#0F172A] font-semibold text-sm">Select Role</Label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {roles.map(r => {
+                    const Icon = r.icon;
+                    const isSelected = role === r.value;
+                    return (
+                      <button
+                        key={r.value}
+                        type="button"
+                        onClick={() => setRole(r.value)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 text-center ${
+                          isSelected 
+                            ? 'border-[#2563EB] bg-blue-50 shadow-sm shadow-blue-100' 
+                            : 'border-[#E2E8F0] bg-white hover:bg-gray-50 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                          isSelected 
+                            ? `bg-gradient-to-br ${r.color} shadow-lg` 
+                            : 'bg-gray-100'
+                        }`}>
+                          <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-[#64748B]'}`} />
+                        </div>
+                        <div>
+                          <p className={`text-sm font-bold ${isSelected ? 'text-[#2563EB]' : 'text-[#0F172A]'}`}>{r.label}</p>
+                          <p className="text-[10px] text-[#94A3B8] font-medium mt-0.5">{r.desc}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-bold bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] shadow-lg shadow-[#2563EB]/25 mt-2 rounded-xl transition-all duration-200 active:scale-[0.98]"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Signing in...
+                  </div>
+                ) : (
+                  'Continue to Dashboard'
+                )}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-2 pt-2 pb-6">
+            <div className="text-sm text-center text-[#64748B] w-full">
+              By signing in, you agree to our <a href="#" className="text-[#2563EB] hover:underline font-medium">Terms of Service</a>
+            </div>
+          </CardFooter>
+        </Card>
+        
+        {/* Powered by footer */}
+        <p className="text-center text-xs text-[#94A3B8] mt-6 font-medium">
+          Powered by <span className="font-bold text-[#64748B]">HireFlow</span> • Enterprise ATS Platform
+        </p>
+      </div>
     </div>
   );
 }
