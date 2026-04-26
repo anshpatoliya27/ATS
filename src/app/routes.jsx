@@ -10,6 +10,7 @@ import { JobList } from '@/features/jobs';
 import { CandidateList, Pipeline } from '@/features/candidates';
 import { Interviews } from '@/features/interviews';
 import { Reports } from '@/features/reports';
+import { Settings } from '@/features/settings';
 
 /**
  * Returns the correct dashboard component based on the user's role.
@@ -38,5 +39,6 @@ export const APP_ROUTES = [
   { path: '/pipeline', element: <Pipeline /> },
   { path: '/interviews', element: <Interviews /> },
   { path: '/reports', element: <Reports /> },
+  { path: '/settings', element: <Settings /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ];

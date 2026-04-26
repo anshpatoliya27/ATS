@@ -8,13 +8,15 @@ import {
   Calendar, 
   BarChart3,
   Settings,
+  LogOut,
   X
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function Sidebar({ onClose }) {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const location = useLocation();
 
   if (!user) return null;
@@ -27,6 +29,7 @@ export function Sidebar({ onClose }) {
     { name: 'Pipeline', path: '/pipeline', icon: KanbanSquare, roles: ['Admin', 'HR', 'Hiring Manager'] },
     { name: 'Interviews', path: '/interviews', icon: Calendar, roles: ['HR', 'Hiring Manager'] },
     { name: 'Reports', path: '/reports', icon: BarChart3, roles: ['Admin', 'HR'] },
+    { name: 'Settings', path: '/settings', icon: Settings, roles: ['Admin', 'HR', 'Vendor', 'Hiring Manager'] },
   ];
 
   const filteredRoutes = routes.filter(route => route.roles.includes(user.role));
@@ -36,26 +39,28 @@ export function Sidebar({ onClose }) {
   };
 
   return (
-    <aside className="w-[280px] bg-white border-r border-[#E2E8F0] flex flex-col h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10 transition-all duration-300">
-      <div className="h-20 flex items-center justify-between px-8 border-b border-[#E2E8F0]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] rounded-xl flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
-            H
-          </div>
-          <span className="font-bold text-xl tracking-tight text-[#0F172A]">HireFlow</span>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <X className="w-5 h-5 text-[#64748B]" />
-          </button>
-        )}
+    <aside className="w-[280px] bg-[#1d3557] flex flex-col h-full z-10 transition-all duration-300 relative text-white">
+      
+      {/* Mobile close button */}
+      {onClose && (
+        <button onClick={onClose} className="absolute top-4 right-4 lg:hidden p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+          <X className="w-5 h-5 text-white" />
+        </button>
+      )}
+
+      {/* Profile Section */}
+      <div className="flex flex-col items-center justify-center pt-12 pb-8 px-6 border-b border-white/10">
+        <Avatar className="h-20 w-20 border-4 border-white/20 shadow-xl mb-4 bg-white">
+          <AvatarImage src={user.avatar} alt={user.name} />
+          <AvatarFallback className="text-[#1d3557] font-bold text-2xl bg-blue-100">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <h3 className="font-bold text-lg tracking-wide text-white">{user.name}</h3>
+        <p className="text-sm text-blue-200 mt-1">{user.email}</p>
       </div>
       
-      <div className="flex-1 overflow-y-auto py-6 px-4">
-        <div className="px-4 mb-3 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">
-          Main Menu
-        </div>
-        <nav className="space-y-1.5">
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto py-6">
+        <nav className="flex flex-col gap-1 pl-4">
           {filteredRoutes.map((route) => {
             const Icon = route.icon;
             const isActive = location.pathname === route.path || 
@@ -67,35 +72,40 @@ export function Sidebar({ onClose }) {
                 to={route.path}
                 onClick={handleNavClick}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group relative overflow-hidden",
+                  "flex items-center gap-4 px-6 py-3.5 text-[15px] font-semibold transition-all duration-200 group relative",
                   isActive 
-                    ? "text-[#2563EB] bg-[#2563EB]/10 shadow-sm" 
-                    : "text-[#64748B] hover:bg-gray-50 hover:text-[#0F172A]"
+                    ? "bg-[#e6eff5] text-[#1d3557] rounded-l-full" 
+                    : "text-blue-100 hover:bg-white/5 rounded-l-full"
                 )}
               >
-                {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#2563EB] rounded-r-full" />
-                )}
                 <Icon className={cn(
                   "w-5 h-5 transition-transform duration-200 group-hover:scale-110", 
-                  isActive ? "text-[#2563EB]" : "text-[#64748B] group-hover:text-[#2563EB]"
+                  isActive ? "text-[#1d3557]" : "text-blue-200 group-hover:text-white"
                 )} />
                 {route.name}
+                
+                {/* Seamless corner illusions for active tab */}
+                {isActive && (
+                  <>
+                    <div className="absolute -top-4 right-0 w-4 h-4 bg-transparent shadow-[4px_4px_0_4px_#e6eff5] rounded-br-full" />
+                    <div className="absolute -bottom-4 right-0 w-4 h-4 bg-transparent shadow-[4px_-4px_0_4px_#e6eff5] rounded-tr-full" />
+                  </>
+                )}
               </Link>
             );
           })}
         </nav>
       </div>
 
-      <div className="p-6 border-t border-[#E2E8F0] bg-gray-50/50 mt-auto">
-        <Link
-          to="/settings"
-          onClick={handleNavClick}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#64748B] hover:bg-white hover:text-[#0F172A] hover:shadow-sm transition-all duration-200 group"
+      {/* Logout */}
+      <div className="p-6 mt-auto">
+        <button
+          onClick={logout}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-blue-200 hover:bg-white/10 hover:text-white transition-all duration-200 group w-full"
         >
-          <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-          Settings
-        </Link>
+          <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
+          Logout
+        </button>
       </div>
     </aside>
   );
