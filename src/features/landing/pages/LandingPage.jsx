@@ -1,13 +1,33 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Zap, Shield, Users, BarChart3, Briefcase, Database, Server, Lock } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Zap, Shield, Users, BarChart3, Briefcase, Database, Server, Lock, Sun, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export function LandingPage() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Initialize dark mode from document class
+  useEffect(() => {
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    if (newTheme) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
   return (
-    <div className="bg-[#e6eff5] font-sans selection:bg-[#1d3557] selection:text-white relative overflow-hidden">
+    <div className="bg-[#e6eff5] font-sans selection:bg-[#1d3557] selection:text-white relative min-h-screen">
       
-      {/* Background Decorative Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/60 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#1d3557]/5 blur-[150px] pointer-events-none" />
+      {/* Background Decorative Elements (Fixed to Viewport to prevent scroll bugs) */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/60 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#1d3557]/5 blur-[150px]" />
+      </div>
 
       {/* Navbar */}
       <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm">
@@ -23,6 +43,13 @@ export function LandingPage() {
             <a href="#architecture" className="hover:text-[#1d3557] transition-colors">Architecture</a>
           </div>
           <div className="flex items-center gap-4">
+            {/* Theme Toggle (Functional) */}
+            <button 
+              onClick={toggleDarkMode}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-[#1d3557]/5 hover:bg-[#1d3557]/10 text-[#1d3557]"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <Link to="/login" className="px-6 py-2.5 bg-[#1d3557] hover:bg-[#2A4B65] text-white rounded-xl text-[15px] font-bold transition-all duration-300 shadow-md shadow-[#1d3557]/20 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
               System Login <ArrowRight className="w-4 h-4" />
             </Link>
