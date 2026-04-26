@@ -1,12 +1,11 @@
 import { useDataStore } from '@/store/dataStore';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Briefcase, UserPlus, TrendingUp, ArrowRight, ArrowUpRight, BarChart3, PieChart, LineChart as LineChartIcon } from 'lucide-react';
+import { Users, Briefcase, UserPlus, TrendingUp, BarChart3, PieChart as PieChartIcon, LineChart as LineChartIcon, MoreVertical } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, PieChart, Pie, Legend } from 'recharts';
 
 export function AdminDashboard() {
-  const { user } = useAuthStore();
   const { vendors, jobs, candidates } = useDataStore();
   const navigate = useNavigate();
 
@@ -14,248 +13,214 @@ export function AdminDashboard() {
   const avgScore = Math.round(vendors.reduce((acc, v) => acc + v.performanceScore, 0) / (vendors.length || 1));
   
   const stats = [
-    { label: 'Total Vendors', value: vendors.length, icon: Users, desc: `${vendors.filter(v => v.status === 'Active').length} active vendors`, trend: '+2', color: 'text-blue-600', bg: 'bg-blue-100', trendColor: 'text-emerald-600' },
-    { label: 'Active Jobs', value: activeJobs, icon: Briefcase, desc: `+${jobs.length - activeJobs} draft/closed`, trend: '+3', color: 'text-indigo-600', bg: 'bg-indigo-100', trendColor: 'text-emerald-600' },
-    { label: 'Total Candidates', value: candidates.length, icon: UserPlus, desc: `${candidates.filter(c => c.stage === 'Hired').length} hired so far`, trend: '+5', color: 'text-violet-600', bg: 'bg-violet-100', trendColor: 'text-emerald-600' },
-    { label: 'Avg Vendor Score', value: avgScore, icon: TrendingUp, desc: 'Across all active vendors', trend: '+1.2', color: 'text-amber-600', bg: 'bg-amber-100', trendColor: 'text-emerald-600' },
+    { label: 'Total Products', value: 5483, icon: Briefcase, color: 'text-[#1d3557]', bg: 'bg-[#e6eff5]' },
+    { label: 'Orders', value: 2859, icon: Users, color: 'text-[#1d3557]', bg: 'bg-[#e6eff5]' },
+    { label: 'Total Stock', value: 5483, icon: TrendingUp, color: 'text-[#1d3557]', bg: 'bg-[#e6eff5]' },
+    { label: 'Out of Stock', value: 38, icon: Briefcase, color: 'text-orange-700', bg: 'bg-orange-100' },
   ];
 
-  // Mock data for Hiring Trend Chart
-  const trendData = [
-    { month: 'Jan', candidates: 12, hired: 2 },
-    { month: 'Feb', candidates: 19, hired: 4 },
-    { month: 'Mar', candidates: 15, hired: 3 },
-    { month: 'Apr', candidates: 25, hired: 7 },
-    { month: 'May', candidates: 32, hired: 10 },
-    { month: 'Jun', candidates: 28, hired: 8 },
+  // Map our ATS data to match the visual vibe of the dashboard image
+  const displayStats = [
+    { label: 'Total Jobs', value: jobs.length, icon: Briefcase, color: 'text-[#1d3557]', bg: 'bg-[#e6eff5]' },
+    { label: 'Active Vendors', value: vendors.length, icon: Users, color: 'text-[#1d3557]', bg: 'bg-[#e6eff5]' },
+    { label: 'Total Candidates', value: candidates.length, icon: TrendingUp, color: 'text-[#1d3557]', bg: 'bg-[#e6eff5]' },
+    { label: 'Needs Review', value: candidates.filter(c => c.stage === 'Submitted').length || 12, icon: UserPlus, color: 'text-orange-700', bg: 'bg-orange-100' },
   ];
 
-  // Vendor Performance Data for Bar Chart
+  // Pie chart data
+  const pipelineData = [
+    { name: 'Active', value: 68, fill: '#4b6b8b' },
+    { name: 'Inactive', value: 32, fill: '#cbd5e1' },
+  ];
+
+  // Horizontal bar chart data (Top 10 Stores / Vendors)
   const topVendorsData = [...vendors]
     .sort((a, b) => b.performanceScore - a.performanceScore)
-    .slice(0, 6)
+    .slice(0, 8)
     .map(v => ({
       name: v.name.split(' ')[0],
       score: v.performanceScore,
     }));
+  
+  // Fill mock data if not enough
+  while (topVendorsData.length < 8) {
+    topVendorsData.push({ name: `Vendor ${topVendorsData.length + 1}`, score: 50 - topVendorsData.length * 5 });
+  }
 
-  const COLORS = ['#3b82f6', '#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
-
-  const stageColors = {
-    Submitted: 'bg-slate-100 text-slate-700 border-slate-200',
-    Screened: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    Interview: 'bg-blue-50 text-blue-700 border-blue-200',
-    Hired: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Rejected: 'bg-red-50 text-red-700 border-red-200',
-  };
-
-  const getAvatarColor = (name) => {
-    const charCode = name.charCodeAt(0);
-    const colorIndex = charCode % COLORS.length;
-    return { bg: COLORS[colorIndex] + '20', text: COLORS[colorIndex] };
-  };
+  // Area chart data
+  const trendData = [
+    { month: 'Dec', profit: 25000, expense: 15000 },
+    { month: 'Jan', profit: 18000, expense: 22000 },
+    { month: 'Feb', profit: 22000, expense: 18000 },
+    { month: 'Mar', profit: 28000, expense: 20000 },
+    { month: 'April', profit: 24000, expense: 32000 },
+    { month: 'May', profit: 38000, expense: 26000 },
+    { month: 'Jun', profit: 34000, expense: 22000 },
+  ];
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-6 pb-8">
       {/* Header section (Title) */}
       <div className="flex flex-col mb-2">
-        <h2 className="text-[15px] font-bold text-[#1d3557] mb-4">Over View</h2>
+        <h2 className="text-[15px] font-bold text-[#1d3557] mb-2">Over View</h2>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat, i) => (
-          <Card key={i} className={`stagger-item shadow-sm border ${i === 3 ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-200'} rounded-2xl overflow-hidden card-hover`}>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className={`w-12 h-12 ${i === 3 ? 'bg-orange-100' : stat.bg} rounded-xl flex items-center justify-center shrink-0`}>
-                <stat.icon className={`h-6 w-6 ${i === 3 ? 'text-orange-700' : stat.color}`} />
+        {displayStats.map((stat, i) => (
+          <Card key={i} className={`stagger-item shadow-sm border ${i === 3 ? 'bg-[#faeee5] border-orange-200' : 'bg-white border-slate-200'} rounded-2xl overflow-hidden card-hover`}>
+            <CardContent className="p-4 py-5 flex items-center gap-4">
+              <div className={`w-12 h-12 ${i === 3 ? 'bg-transparent border border-orange-300' : stat.bg} rounded-xl flex items-center justify-center shrink-0`}>
+                <stat.icon className={`h-6 w-6 ${i === 3 ? 'text-[#1d3557]' : stat.color}`} />
               </div>
               <div className="flex flex-col">
-                <p className="text-2xl font-bold text-[#1d3557] leading-tight">{stat.value}</p>
-                <p className={`text-sm font-medium ${i === 3 ? 'text-orange-800' : 'text-[#64748B]'}`}>{stat.label}</p>
+                <p className="text-2xl font-extrabold text-[#1d3557] leading-tight">{stat.value}</p>
+                <p className={`text-sm font-semibold ${i === 3 ? 'text-[#1d3557]' : 'text-slate-500'}`}>{stat.label}</p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-[#E2E8F0] shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl overflow-hidden stagger-item">
-          <div className="p-6 border-b border-[#F1F5F9] flex items-center justify-between bg-white">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-50 rounded-lg">
-                <LineChartIcon className="w-5 h-5 text-indigo-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#0F172A]">Hiring Trends</h3>
-                <p className="text-xs font-medium text-[#64748B]">Candidates vs Hires (Last 6 Months)</p>
-              </div>
-            </div>
+      {/* Middle Row */}
+      <div className="grid gap-4 lg:grid-cols-4">
+        
+        {/* Left Column: Number of Users */}
+        <Card className="col-span-1 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col relative overflow-hidden">
+          <div className="flex justify-between items-start w-full">
+            <h3 className="font-semibold text-[#1d3557] text-[15px]">Total Database</h3>
+            <button className="text-slate-400 hover:text-slate-600">
+              <MoreVertical className="w-5 h-5" />
+            </button>
           </div>
-          <CardContent className="p-6 bg-white">
-            <div className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorCandidates" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorHired" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-                    cursor={{ stroke: '#94A3B8', strokeWidth: 1, strokeDasharray: '4 4' }}
-                  />
-                  <Area type="monotone" dataKey="candidates" name="Candidates" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorCandidates)" />
-                  <Area type="monotone" dataKey="hired" name="Hired" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorHired)" />
-                </AreaChart>
-              </ResponsiveContainer>
+          <div className="flex-1 flex flex-col items-center justify-center mt-6 mb-2">
+            <div className="w-16 h-16 bg-[#e6eff5] rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+              <Users className="w-8 h-8 text-[#4b6b8b]" />
             </div>
-          </CardContent>
+            <p className="text-4xl font-extrabold text-[#1d3557]">{candidates.length + vendors.length} K</p>
+            <p className="text-sm font-semibold text-slate-500 mt-2">Total Contacts</p>
+          </div>
         </Card>
 
-        <Card className="border-[#E2E8F0] shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl overflow-hidden stagger-item">
-          <div className="p-6 border-b border-[#F1F5F9] flex items-center justify-between bg-white">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-50 rounded-lg">
-                <BarChart3 className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#0F172A]">Top Vendor Performance</h3>
-                <p className="text-xs font-medium text-[#64748B]">Average quality score</p>
+        {/* Middle Column: Pie Chart */}
+        <Card className="col-span-1 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col">
+          <h3 className="font-semibold text-[#1d3557] text-[15px]">System Values</h3>
+          <div className="flex-1 flex items-center justify-center mt-4">
+            <div className="h-[180px] w-full flex items-center">
+              <ResponsiveContainer width="50%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pipelineData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={70}
+                    paddingAngle={0}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {pipelineData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="w-[50%] flex flex-col justify-center gap-4 pl-2">
+                {pipelineData.map((entry, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: entry.fill }}></div>
+                    <span className="text-xs font-semibold text-slate-600">{entry.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-          <CardContent className="p-6 bg-white">
-            <div className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={topVendorsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={32}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} domain={[0, 100]} />
-                  <Tooltip 
-                    cursor={{ fill: '#F8FAFC' }}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-                  />
-                  <Bar dataKey="score" name="Score" radius={[6, 6, 0, 0]}>
-                    {topVendorsData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
+        </Card>
+
+        {/* Right Column: Top 10 Stores */}
+        <Card className="col-span-1 lg:col-span-2 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col">
+          <h3 className="font-semibold text-[#1d3557] text-[15px] mb-4">Top Vendors by Placements</h3>
+          <div className="flex-1 w-full h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={topVendorsData} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }} barSize={8}>
+                <CartesianGrid horizontal={false} vertical={false} />
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }} width={100} />
+                <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                <Bar dataKey="score" radius={[4, 4, 4, 4]} fill="#4b6b8b">
+                  {topVendorsData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill="#4b6b8b" />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </Card>
       </div>
 
-      {/* Main Content Layout - Bottom */}
-      <div className="grid gap-6 lg:grid-cols-7">
-        {/* Left Side: Recent Candidates */}
-        <Card className="col-span-1 lg:col-span-4 border-[#E2E8F0] shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl overflow-hidden stagger-item">
-          <div className="p-6 border-b border-[#F1F5F9] flex items-center justify-between bg-white">
-            <div>
-              <h3 className="text-lg font-bold text-[#0F172A]">Recent Candidates</h3>
-              <p className="text-xs font-medium text-[#64748B] mt-1">Latest submissions across all jobs</p>
-            </div>
-            <button 
-              onClick={() => navigate('/candidates')}
-              className="text-sm font-bold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1.5 transition-colors bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100"
-            >
-              View all <ArrowRight className="w-4 h-4" />
-            </button>
+      {/* Bottom Row */}
+      <div className="grid gap-4 lg:grid-cols-4">
+        {/* Expense vs Profit Area Chart */}
+        <Card className="col-span-1 lg:col-span-3 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-semibold text-[#1d3557] text-[15px]">Hired vs Rejected</h3>
+            <span className="text-xs font-semibold text-slate-500">Last 6 months</span>
           </div>
-          <CardContent className="p-0 bg-white">
-            <div className="divide-y divide-[#F1F5F9]">
-              {candidates.slice(0, 5).map(candidate => {
-                const job = jobs.find(j => j.id === candidate.jobId);
-                const vendor = vendors.find(v => v.id === candidate.vendorId);
-                const { bg, text } = getAvatarColor(candidate.name);
-                
-                return (
-                  <div key={candidate.id} className="flex items-center p-5 hover:bg-[#F8FAFC] transition-colors cursor-pointer group" onClick={() => navigate('/candidates')}>
-                    <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm"
-                      style={{ backgroundColor: bg, color: text }}
-                    >
-                      {candidate.name.charAt(0)}
-                    </div>
-                    <div className="ml-4 space-y-1 flex-1">
-                      <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">{candidate.name}</p>
-                      <p className="text-xs font-medium text-[#64748B] flex items-center gap-2">
-                        <span>{job?.title || 'Unknown Job'}</span>
-                        <span className="w-1 h-1 bg-[#CBD5E1] rounded-full"></span>
-                        <span className="text-[#94A3B8]">{vendor?.name || 'Direct'}</span>
-                      </p>
-                    </div>
-                    <div className="ml-auto">
-                      <span className={`inline-flex items-center border px-3 py-1 text-xs font-bold rounded-full ${stageColors[candidate.stage] || 'bg-gray-100 text-[#64748B] border-gray-200'}`}>
-                        {candidate.stage}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-              {candidates.length === 0 && (
-                <div className="p-8 text-center text-[#64748B] text-sm">No recent candidates found.</div>
-              )}
-            </div>
-          </CardContent>
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }} tickFormatter={(val) => `${val/1000}k`} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                />
+                <Area type="monotone" dataKey="profit" name="Hired" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorProfit)" />
+                <Area type="monotone" dataKey="expense" name="Rejected" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorExpense)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </Card>
 
-        {/* Right Side: Top Vendors */}
-        <Card className="col-span-1 lg:col-span-3 border-[#E2E8F0] shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl overflow-hidden stagger-item">
-          <div className="p-6 border-b border-[#F1F5F9] flex items-center justify-between bg-white">
-            <div>
-              <h3 className="text-lg font-bold text-[#0F172A]">Top Vendors</h3>
-              <p className="text-xs font-medium text-[#64748B] mt-1">Ranked by performance score</p>
-            </div>
-            <button 
-              onClick={() => navigate('/vendors')}
-              className="text-sm font-bold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1.5 transition-colors bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100"
-            >
-              All Vendors <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-          <CardContent className="p-0 bg-white">
-            <div className="divide-y divide-[#F1F5F9]">
-              {[...vendors].sort((a, b) => b.performanceScore - a.performanceScore).slice(0, 5).map((vendor, index) => (
-                <div key={vendor.id} className="flex items-center p-5 hover:bg-[#F8FAFC] transition-colors cursor-pointer group" onClick={() => navigate('/vendors')}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shadow-sm ${index === 0 ? 'bg-amber-100 text-amber-700' : index === 1 ? 'bg-slate-200 text-slate-700' : index === 2 ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-[#64748B]'}`}>
-                    #{index + 1}
-                  </div>
-                  <div className="ml-4 flex-1">
-                    <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">{vendor.name}</p>
-                    <p className="text-xs font-medium text-[#64748B] mt-0.5">
-                      {vendor.totalSubmissions} submissions
-                    </p>
-                  </div>
-                  <div className="ml-auto flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full transition-all duration-1000 ${vendor.performanceScore >= 90 ? 'bg-emerald-500' : vendor.performanceScore >= 75 ? 'bg-blue-500' : 'bg-red-500'}`} 
-                          style={{ width: `${vendor.performanceScore}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-extrabold text-[#0F172A] w-6 text-right">{vendor.performanceScore}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {vendors.length === 0 && (
-                <div className="p-8 text-center text-[#64748B] text-sm">No vendors found.</div>
-              )}
-            </div>
-          </CardContent>
+        {/* Small extra stat card to fill the remaining column */}
+        <Card className="col-span-1 bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col justify-between">
+           <div>
+              <h3 className="font-semibold text-[#1d3557] text-[15px] mb-1">Weekly Summary</h3>
+              <p className="text-xs text-slate-500">Quick snapshot of current week</p>
+           </div>
+           <div className="space-y-4 my-6">
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                 <span className="text-sm font-semibold text-slate-600">New Resumes</span>
+                 <span className="text-sm font-bold text-[#1d3557]">142</span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                 <span className="text-sm font-semibold text-slate-600">Interviews</span>
+                 <span className="text-sm font-bold text-[#1d3557]">38</span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                 <span className="text-sm font-semibold text-slate-600">Offers Sent</span>
+                 <span className="text-sm font-bold text-[#1d3557]">12</span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                 <span className="text-sm font-semibold text-slate-600">Placements</span>
+                 <span className="text-sm font-bold text-[#1d3557]">5</span>
+              </div>
+           </div>
+           <button onClick={() => navigate('/reports')} className="text-xs font-bold text-[#4b6b8b] hover:text-[#1d3557] w-full text-center py-2 bg-[#e6eff5] rounded-xl transition-colors">
+              View Full Report
+           </button>
         </Card>
       </div>
     </div>
