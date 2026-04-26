@@ -43,28 +43,22 @@ export function HiringManagerDashboard() {
 
   return (
     <div className="space-y-8 pb-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="animate-slide-up">
-          <h2 className="text-3xl font-extrabold tracking-tight text-[#0F172A]">Hiring Manager</h2>
-          <p className="text-[#64748B] mt-1 text-base">Welcome back, <span className="font-semibold text-[#0F172A]">{user?.name}</span>. Review candidates and make hiring decisions.</p>
-        </div>
+      {/* Header section (Title) */}
+      <div className="flex flex-col mb-2">
+        <h2 className="text-[15px] font-bold text-[#1d3557] mb-4">Over View</h2>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {stats.map((stat, i) => (
-          <Card key={i} className="stagger-item border-none shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 card-hover bg-white rounded-2xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white to-gray-50 rounded-bl-full opacity-50 -z-10" />
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">{stat.label}</p>
-                  <p className="text-3xl font-extrabold text-[#0F172A]">{stat.value}</p>
-                </div>
-                <div className={`w-12 h-12 ${stat.bg} rounded-2xl flex items-center justify-center transform transition-transform group-hover:scale-110`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
+          <Card key={i} className={`stagger-item shadow-sm border ${i === 2 ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-200'} rounded-2xl overflow-hidden card-hover`}>
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className={`w-12 h-12 ${i === 2 ? 'bg-orange-100' : stat.bg} rounded-xl flex items-center justify-center shrink-0`}>
+                <stat.icon className={`h-6 w-6 ${i === 2 ? 'text-orange-700' : stat.color}`} />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-2xl font-bold text-[#1d3557] leading-tight">{stat.value}</p>
+                <p className={`text-sm font-medium ${i === 2 ? 'text-orange-800' : 'text-[#64748B]'}`}>{stat.label}</p>
               </div>
             </CardContent>
           </Card>
