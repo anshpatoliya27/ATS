@@ -181,3 +181,24 @@ body {
   opacity: 0.4;
   animation: pulse-soft 2s ease-in-out infinite;
 }
+
+/* --- Enterprise Dark Mode Hack --- */
+/* This elegantly inverts the lightness while preserving the hue to create an instant dark mode */
+html.dark {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #111;
+}
+
+/* Prevent double-inversion on images and charts */
+html.dark img,
+html.dark video,
+html.dark .recharts-surface,
+html.dark .recharts-wrapper,
+html.dark .no-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Ensure smooth transition */
+html {
+  transition: filter 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}

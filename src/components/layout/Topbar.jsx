@@ -3,13 +3,28 @@ import { useAuthStore } from '@/store/authStore';
 import { useDataStore } from '@/store/dataStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Topbar({ onMenuClick }) {
   const { user } = useAuthStore();
   const { notifications, markNotificationRead, markAllNotificationsRead } = useDataStore();
   const [showNotifs, setShowNotifs] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Initialize dark mode from document class
+  useEffect(() => {
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    if (newTheme) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   if (!user) return null;
 
@@ -46,9 +61,9 @@ export function Topbar({ onMenuClick }) {
           </div>
 
           <div className="flex items-center gap-3 bg-[#1d3557] rounded-full p-1.5 px-3 shadow-md shadow-blue-900/10">
-            {/* Theme Toggle (Visual only for now) */}
+            {/* Theme Toggle (Functional) */}
             <button 
-              onClick={() => setIsDarkMode(!isDarkMode)}
+              onClick={toggleDarkMode}
               className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-white/20 text-white"
             >
               {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" fill="currentColor" />}

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Zap, Shield, Users, BarChart3, Briefcase } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Zap, Shield, Users, BarChart3, Briefcase, Database, Server, Lock } from 'lucide-react';
 
 export function LandingPage() {
   return (
@@ -115,8 +115,59 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Architecture Section */}
+      <section id="architecture" className="py-24 px-6 bg-[#f8fafc] relative z-10 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-black text-[#1d3557] tracking-tight mb-4">System Architecture</h2>
+          <p className="text-lg text-slate-500 font-medium mb-16 max-w-2xl mx-auto">
+            A secure, scalable architecture designed for enterprise talent acquisition.
+          </p>
+          
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-4 relative">
+            {/* Frontend */}
+            <div className="w-full md:w-1/3 p-8 bg-white rounded-3xl border border-slate-200 shadow-xl shadow-[#1d3557]/5 z-10 relative">
+              <div className="w-16 h-16 bg-[#e6eff5] rounded-2xl mx-auto flex items-center justify-center mb-4">
+                <Zap className="w-8 h-8 text-[#1d3557]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#1d3557] mb-2">Modern Frontend</h3>
+              <p className="text-sm text-slate-500 font-medium">React + Tailwind UI Layer</p>
+            </div>
+            
+            {/* Connector */}
+            <div className="hidden md:flex flex-1 h-1 bg-slate-200 relative">
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-[#1d3557] rounded-full border-4 border-[#f8fafc] flex items-center justify-center">
+                 <Lock className="w-3 h-3 text-white" />
+               </div>
+            </div>
+
+            {/* Backend */}
+            <div className="w-full md:w-1/3 p-8 bg-white rounded-3xl border border-slate-200 shadow-xl shadow-[#1d3557]/5 z-10 relative">
+              <div className="w-16 h-16 bg-[#e6eff5] rounded-2xl mx-auto flex items-center justify-center mb-4">
+                <Server className="w-8 h-8 text-[#1d3557]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#1d3557] mb-2">Secure Core</h3>
+              <p className="text-sm text-slate-500 font-medium">Node.js + REST API</p>
+            </div>
+
+            {/* Connector */}
+            <div className="hidden md:flex flex-1 h-1 bg-slate-200 relative">
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-300 rounded-full" />
+            </div>
+
+            {/* Database */}
+            <div className="w-full md:w-1/3 p-8 bg-white rounded-3xl border border-slate-200 shadow-xl shadow-[#1d3557]/5 z-10 relative">
+              <div className="w-16 h-16 bg-[#1d3557] rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-[#1d3557]/20">
+                <Database className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-[#1d3557] mb-2">Data Storage</h3>
+              <p className="text-sm text-slate-500 font-medium">Encrypted Postgres DB</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer CTA & Legal */}
-      <footer className="bg-[#1d3557] text-white py-16 px-6">
+      <footer className="bg-[#1d3557] text-white py-16 px-6 relative z-10">
         <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
           <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white font-black text-2xl mb-6">H</div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to access the system?</h2>
