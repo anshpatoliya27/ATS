@@ -4,16 +4,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Briefcase, Shield, Users, BarChart3 } from 'lucide-react';
+import { ROLE_OPTIONS } from '@/constants';
 
-const roles = [
-  { value: 'Admin', label: 'Admin', icon: Shield, desc: 'Full system access', color: 'from-violet-500 to-purple-600' },
-  { value: 'HR', label: 'HR', icon: Users, desc: 'Manage jobs & candidates', color: 'from-blue-500 to-blue-600' },
-  { value: 'Vendor', label: 'Vendor', icon: Briefcase, desc: 'Submit candidates', color: 'from-amber-500 to-orange-600' },
-  { value: 'Hiring Manager', label: 'Hiring Manager', icon: BarChart3, desc: 'Review & approve', color: 'from-emerald-500 to-teal-600' },
-];
-
-export function Login() {
+export function LoginPage() {
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('HR');
@@ -69,7 +62,7 @@ export function Login() {
               <div className="space-y-2.5">
                 <Label className="text-[#0F172A] font-semibold text-sm">Select Role</Label>
                 <div className="grid grid-cols-2 gap-2.5">
-                  {roles.map(r => {
+                  {ROLE_OPTIONS.map(r => {
                     const Icon = r.icon;
                     const isSelected = role === r.value;
                     return (
